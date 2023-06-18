@@ -27,7 +27,7 @@ def get_registration_jwt(user_id, expires_in=5 * 60):
         },
     }
     return jwt.encode(payload,
-                      current_app.config['AUTHY_PRODUCTION_API_KEY']).decode()
+                      current_app.config['AUTHY_PRODUCTION_API_KEY'])
 
 
 def get_qrcode(jwt):
@@ -93,6 +93,7 @@ def send_push_authentication(user):
         seconds_to_expire=120)
     if not resp.ok():
         return None
+    print(resp.response.json())
     return resp.get_uuid()
 
 
@@ -107,4 +108,7 @@ def check_push_authentication_status(uuid):
     resp = authy_api.one_touch.get_approval_status(uuid)
     if not resp.ok():
         return 'error'
-    return resp.content['approval_request']['status']
+    if 'device' in resp.content['approval_request']:
+        print(resp.content['approval_request']['device']['ip'])
+        return resp.content['approval_request']['status'], resp.content['approval_request']['device']['ip']
+    return resp.content['approval_request']['status'], 0

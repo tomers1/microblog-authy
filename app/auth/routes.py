@@ -156,8 +156,9 @@ def check_2fa():
 
 @bp.route('/2fa/check/poll')
 def check_2fa_poll():
-    push_status = authy.check_push_authentication_status(
+    push_status, device_ip = authy.check_push_authentication_status(
         session['authy_push_uuid'])
+    print(f"pc ip:{request.remote_addr}, device_ip: {device_ip}")
     if push_status == 'approved':
         username = session['username']
         del session['username']
